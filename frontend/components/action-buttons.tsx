@@ -1,25 +1,58 @@
-'use client';
-
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import React, { useState } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
 
 interface ActionButtonsProps {
-  onAction: (actionType: string) => void;
+  onAction: (actionType: string, amount?: number) => void;
   canCheck: boolean;
   canCall: boolean;
   betToCall: number;
+  bigBlind: number;
+  playerStack: number;
 }
-export function ActionButtons({ onAction, canCheck, canCall, betToCall }: ActionButtonsProps) {
-  // Logic to manage bet/raise amount, disabled states, etc.
+
+export const ActionButtons: React.FC<ActionButtonsProps> = ({
+  onAction,
+  canCheck,
+  canCall,
+  betToCall,
+  bigBlind,
+  playerStack,
+}) => {
+  const [betAmount, setBetAmount] = useState<number>(bigBlind);
+
+  const handleBetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value)) {
+      setBetAmount(value);
+    }
+  };
+
+  const isAllIn = betToCall >= playerStack;
 
   return (
-    <div className="space-y-2 p-4">
+    <div className="flex items-center space-x-2">
+      <Button onClick={() => onAction('fold')}>Fold</Button>
+      {canCheck ? (
+        <Button onClick={() => onAction('check')}>Check</Button>
+      ) : (
+        <Button onClick={() => onAction('call')}>
+          Call {isAllIn ? '(All-In)' : `$${betToCall}`}
+        </Button>
+      )}
       <div className="flex space-x-2">
-        <Button onClick={() => onAction('fold')}>Fold</Button>
-        <Button onClick={() => onAction('check')} disabled={!canCheck}>Check</Button>
-        <Button onClick={() => onAction('call')} disabled={!canCall}>Call ({betToCall})</Button>
+        <Input
+          type="number"
+          value={betAmount}
+          onChange={handleBetChange}
+          min={bigBlind}
+          max={playerStack}
+          step={bigBlind}
+          className="w-24"
+        />
+        <Button onClick={() => onAction('bet', betAmount)}>Bet</Button>
       </div>
-      {/* ... Bet/Raise/All-in buttons and amount input ... */}
+      <Button onClick={() => onAction('raise', betToCall * 2)}>Raise</Button>
     </div>
   );
-}
+};
