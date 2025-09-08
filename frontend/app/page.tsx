@@ -5,7 +5,7 @@ import { PlayerSetup } from '@/components/player-setup';
 import { ActionButtons } from '@/components/action-buttons';
 import { GameLog } from '@/components/game-log';
 import { HandHistory } from '@/components/hand-history';
-import { Button } from '@/components/ui/button';
+// The import for Button is removed as it was not being used.
 
 export default function HomePage() {
   const { state, log, handHistory, resetHand, handlePlayerAction } = useGameLogic();

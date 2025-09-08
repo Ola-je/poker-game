@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+import React from 'react';
 
 interface ActionButtonsProps {
-  onAction: (actionType: string, amount?: number) => void;
+  onAction: (action: string) => void;
   canCheck: boolean;
   canCall: boolean;
   betToCall: number;
@@ -17,42 +15,38 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   canCall,
   betToCall,
   bigBlind,
-  playerStack,
+  playerStack
 }) => {
-  const [betAmount, setBetAmount] = useState<number>(bigBlind);
-
-  const handleBetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value, 10);
-    if (!isNaN(value)) {
-      setBetAmount(value);
-    }
-  };
-
-  const isAllIn = betToCall >= playerStack;
-
   return (
-    <div className="flex items-center space-x-2">
-      <Button onClick={() => onAction('fold')}>Fold</Button>
-      {canCheck ? (
-        <Button onClick={() => onAction('check')}>Check</Button>
-      ) : (
-        <Button onClick={() => onAction('call')}>
-          Call {isAllIn ? '(All-In)' : `$${betToCall}`}
-        </Button>
+    <div className="flex space-x-2 mt-4">
+      {canCheck && (
+        <button
+          onClick={() => onAction('check')}
+          className="bg-gray-500 text-white px-4 py-2 rounded-md"
+        >
+          Check
+        </button>
       )}
-      <div className="flex space-x-2">
-        <Input
-          type="number"
-          value={betAmount}
-          onChange={handleBetChange}
-          min={bigBlind}
-          max={playerStack}
-          step={bigBlind}
-          className="w-24"
-        />
-        <Button onClick={() => onAction('bet', betAmount)}>Bet</Button>
-      </div>
-      <Button onClick={() => onAction('raise', betToCall * 2)}>Raise</Button>
+      {canCall && (
+        <button
+          onClick={() => onAction('call')}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+        >
+          Call (${betToCall})
+        </button>
+      )}
+      <button
+        onClick={() => onAction('fold')}
+        className="bg-red-500 text-white px-4 py-2 rounded-md"
+      >
+        Fold
+      </button>
+      <button
+        onClick={() => onAction('bet')}
+        className="bg-green-500 text-white px-4 py-2 rounded-md"
+      >
+        Bet
+      </button>
     </div>
   );
 };
