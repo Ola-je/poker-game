@@ -1,32 +1,17 @@
-'use client';
-
-import { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import React from 'react';
+import { Button } from './ui/button';
 
 interface PlayerSetupProps {
-  onReset: (stack: number) => void;
+  onReset: () => void;
 }
 
-
-export function PlayerSetup({ onReset }: PlayerSetupProps) {
-  const [stack, setStack] = useState(1000); // Default stack
-
-  const handleReset = () => {
-    // You'll need to pass the stack value to a parent component or a hook
-    onReset(stack);
-  };
-
+export const PlayerSetup: React.FC<PlayerSetupProps> = ({ onReset }) => {
   return (
-    <div className="flex items-center space-x-2 p-4">
-      <Input
-        type="number"
-        value={stack}
-        onChange={(e) => setStack(Number(e.target.value))}
-        placeholder="Starting Stack"
-        className="w-[200px]"
-      />
-      <Button onClick={handleReset}>Reset</Button>
+    <div className="p-4 bg-black rounded-md shadow-md text-center">
+      <h2 className="text-xl font-semibold mb-2">Game Controls</h2>
+      <Button onClick={onReset} className="w-full">
+        Start a New Hand
+      </Button>
     </div>
   );
-}
+};
