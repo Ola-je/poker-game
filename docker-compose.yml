@@ -51,6 +51,7 @@ services:
       - "5432:5432"
     volumes:
       - poker-db-data:/var/lib/postgresql/data
+      - C:/poker-game/poker-backend/migrations:/migrations      
 
 # ------------------
 # Named Volumes

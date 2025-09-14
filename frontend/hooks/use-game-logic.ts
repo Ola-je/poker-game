@@ -45,7 +45,7 @@ export const useGameLogic = () => {
   });
 
   const [log, setLog] = useState<string[]>([]);
-  const [handHistory, setHandHistory] = useState<any[]>([]); // <-- Add this
+  const [handHistory, setHandHistory] = useState<any[]>([]);
 
   const addLog = useCallback((message: string) => {
     setLog((prevLog) => [...prevLog, message]);
@@ -57,32 +57,44 @@ export const useGameLogic = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          players: Array.from({ length: numPlayers }, (_, i) => `Player ${i+1}`),
+          players: Array.from({ length: numPlayers }, (_, i) => `Player ${i + 1}`),
           stacks: Array(numPlayers).fill(1000),
         }),
       });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Backend error ${res.status}: ${errorText}`);
+      }
+
       const data = await res.json();
-      setState((prev) => ({ ...prev, ...data })); 
+      setState((prev) => ({ ...prev, ...data }));
       setLog(["New hand started."]);
-      setHandHistory((prev) => [...prev, data]); // <-- Save hand in history
-    } catch (err) {
-      addLog("Error: Could not reset hand.");
+      setHandHistory((prev) => [...prev, data]);
+    } catch (err: any) {
+      addLog(`Error: Could not reset hand. ${err.message || err}`);
     }
   }, [addLog]);
 
   const handlePlayerAction = useCallback(
     async (action: string, betAmount: number = 0) => {
       try {
-        const res = await fetch("http://localhost:8000/hands/1/action", { // Simplified: hand_id=1 for now
+        const res = await fetch("http://localhost:8000/hands/1/action", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action, betAmount }),
         });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(`Backend error ${res.status}: ${errorText}`);
+        }
+
         const data = await res.json();
         setState((prev) => ({ ...prev, ...data }));
         addLog(`Action: ${action}${betAmount ? ` $${betAmount}` : ""}`);
-      } catch (err) {
-        addLog("Error: Action failed.");
+      } catch (err: any) {
+        addLog(`Error: Action failed. ${err.message || err}`);
       }
     },
     [addLog]

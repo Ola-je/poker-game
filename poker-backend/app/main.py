@@ -8,7 +8,7 @@ from app.api.hands import router as hands_router
 from app.api.game import router as game_router  # game endpoints
 
 # Load environment variables from .env
-load_dotenv()  # this will load both .env or .env.example if .env exists
+load_dotenv()
 
 # DB and Gemini API key
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/poker_dev")
@@ -40,5 +40,5 @@ async def on_shutdown():
     print("✅ DB pool closed on shutdown")
 
 # Include API routers
-app.include_router(hands_router, prefix="/hands")
+app.include_router(hands_router)  # no prefix
 app.include_router(game_router, prefix="/game")
