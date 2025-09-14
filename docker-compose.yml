@@ -1,42 +1,59 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  # The Database Service
-  db:
-    image: postgres:13-alpine
-    container_name: poker-db
-    environment:
-      POSTGRES_DB: poker
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    ports:
-      - "5432:5432"
-    volumes:
-      - poker_data:/var/lib/postgresql/data
-
-  # The Backend Service
+  # ------------------
+  # Backend Service
+  # ------------------
   backend:
-    build: ./backend
+    build:
+      context: ./poker-backend
+      dockerfile: Dockerfile
     container_name: poker-backend
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
     environment:
-      POSTGRES_DB: poker
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      # Use the Docker service name 'db' as the host
-      DB_HOST: db 
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/poker
     depends_on:
       - db
+    volumes:
+      - ./poker-backend:/app
 
-  # The Frontend Service
+  # ------------------
+  # Frontend Service
+  # ------------------
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: poker-frontend
     ports:
       - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://backend:8000
     depends_on:
       - backend
+    # volumes:
+      # - ./frontend:/app
 
+  # ------------------
+  # PostgreSQL Database
+  # ------------------
+  db:
+    image: postgres:15-alpine
+    container_name: poker-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: poker
+    ports:
+      - "5432:5432"
+    volumes:
+      - poker-db-data:/var/lib/postgresql/data
+
+# ------------------
+# Named Volumes
+# ------------------
 volumes:
-  poker_data:
+  poker-db-data:

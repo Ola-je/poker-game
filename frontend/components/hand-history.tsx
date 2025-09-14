@@ -18,7 +18,7 @@ interface HandHistoryProps {
 
 export const HandHistory: React.FC<HandHistoryProps> = ({ history }) => {
   return (
-    <div className="p-4 bg-white rounded-md shadow-md">
+    <div className="p-4 bg-black rounded-md shadow-md">
       <h2 className="text-xl font-semibold mb-2">Hand History</h2>
       <ul className="space-y-2 max-h-96 overflow-y-auto">
         {history.length > 0 ? (
